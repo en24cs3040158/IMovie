@@ -37,7 +37,7 @@ app.get('/', (req, res) => {
   });
 });
 
-app.get('/api/health', (req, res) => {
+app.get(['/api/health', '/imovies/health'], (req, res) => {
   res.json({
     status: 'UP',
     timestamp: new Date().toISOString(),
@@ -45,11 +45,16 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// API Routes
-app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/movies', require('./routes/movieRoutes'));
-app.use('/api/showtimes', require('./routes/showtimeRoutes'));
-app.use('/api/bookings', require('./routes/bookingRoutes'));
+// API Routes (supports both /api and /imovies prefixes seamlessly)
+const authRoutes = require('./routes/authRoutes');
+const movieRoutes = require('./routes/movieRoutes');
+const showtimeRoutes = require('./routes/showtimeRoutes');
+const bookingRoutes = require('./routes/bookingRoutes');
+
+app.use(['/api/auth', '/imovies/auth', '/imovies/api/auth'], authRoutes);
+app.use(['/api/movies', '/imovies/movies', '/imovies/api/movies'], movieRoutes);
+app.use(['/api/showtimes', '/imovies/showtimes', '/imovies/api/showtimes'], showtimeRoutes);
+app.use(['/api/bookings', '/imovies/bookings', '/imovies/api/bookings'], bookingRoutes);
 
 // Error handling middleware
 app.use(notFound);
@@ -61,4 +66,3 @@ app.listen(PORT, () => {
   console.log(`🚀 IMovies Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
   console.log(`🌐 API URL: http://localhost:${PORT}`);
 });
-
